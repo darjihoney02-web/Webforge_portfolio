@@ -9,7 +9,7 @@
 
 <br><br>
 
-<a href="https://darjihoney02-web.github.io/WebForge_compition/">
+<a href=" https://darjihoney02-web.github.io/Webforge_portfolio/">
 <img src="https://img.shields.io/badge/%E2%9C%A8%20VISIT%20MY%20PORTFOLIO-00BFFF?style=for-the-badge&logo=googlechrome&logoColor=white" />
 </a>
 
