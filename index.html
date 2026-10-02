@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Honey Darji — AI Developer & BCA Student</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════
+   TOKENS
+═══════════════════════════════════════ */
+:root{
+  --bg:#03050f;
+  --surface:rgba(8,14,40,.75);
+  --surface2:rgba(14,22,58,.85);
+  --border:rgba(56,189,248,.15);
+  --bh:rgba(56,189,248,.48);
+  --a1:#38bdf8;
+  --a2:#818cf8;
+  --a3:#34d399;
+  --a4:#f472b6;
+  --a5:#fbbf24;
+  --text:#e2eeff;
+  --text2:#92b8d8;
+  --muted:#3d5c7c;
+  --glow1:0 0 40px rgba(56,189,248,.22);
+  --glow2:0 0 40px rgba(129,140,248,.2);
+  --r:18px;
+  --mono:'Space Mono',monospace;
+  --dis:'Syne',sans-serif;
+  --body:'DM Sans',sans-serif;
+  --ease:.38s cubic-bezier(.4,0,.2,1);
+}
+[data-theme="light"]{
+  --bg:#eef5ff;
+  --surface:rgba(255,255,255,.82);
+  --surface2:rgba(232,243,255,.9);
+  --border:rgba(30,110,180,.18);
+  --bh:rgba(14,100,175,.5);
+  --text:#08182e;
+  --text2:#1e3d5e;
+  --muted:#5a84aa;
+  --glow1:0 0 36px rgba(30,110,180,.14);
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:var(--body);
+  background:var(--bg);color:var(--text);
+  min-height:100vh;overflow-x:hidden;cursor:none;
+  transition:background var(--ease),color var(--ease);
+}
+
+/* ═══ CURSOR ═══ */
+#cur{width:9px;height:9px;background:var(--a1);border-radius:50%;
+  position:fixed;pointer-events:none;z-index:9999;mix-blend-mode:screen;
+  transform:translate(-50%,-50%);transition:transform .12s,background .2s;}
+#cur-r{width:32px;height:32px;border:1.5px solid rgba(56,189,248,.4);border-radius:50%;
+  position:fixed;pointer-events:none;z-index:9998;
+  transform:translate(-50%,-50%);transition:opacity .3s;}
+body.ch #cur{transform:translate(-50%,-50%) scale(3.2);background:var(--a2);}
+body.ch #cur-r{opacity:0;}
+
+/* ═══ CANVAS ═══ */
+#bg{position:fixed;inset:0;z-index:-2;opacity:.48;}
+.grain{position:fixed;inset:0;z-index:-1;opacity:.028;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  pointer-events:none;}
+
+/* ═══ NAV ═══ */
+nav{
+  position:fixed;top:0;left:0;width:100%;z-index:300;
+  padding:13px 44px;
+  display:flex;justify-content:space-between;align-items:center;
+  background:rgba(3,5,15,.58);backdrop-filter:blur(22px);
+  border-bottom:1px solid var(--border);
+  transition:background var(--ease);
+}
+[data-theme="light"] nav{background:rgba(238,245,255,.72);}
+.logo{font-family:var(--mono);font-size:.8rem;color:var(--a1);letter-spacing:.15em;}
+.nav-r{display:flex;gap:26px;align-items:center;}
+.nav-r a{
+  font-family:var(--mono);font-size:.68rem;color:var(--muted);
+  text-decoration:none;letter-spacing:.1em;text-transform:uppercase;
+  transition:color .22s;position:relative;
+}
+.nav-r a::after{content:'';position:absolute;bottom:-3px;left:0;width:0;height:1px;
+  background:var(--a1);transition:width .28s;}
+.nav-r a:hover{color:var(--a1);}
+.nav-r a:hover::after{width:100%;}
+.tbtn{
+  background:none;border:1px solid var(--border);border-radius:50px;
+  padding:5px 14px;font-family:var(--mono);font-size:.65rem;
+  color:var(--a1);cursor:none;letter-spacing:.06em;
+  transition:border-color .22s,background .22s;
+}
+.tbtn:hover{background:rgba(56,189,248,.1);border-color:var(--a1);}
+
+/* ═══ SECTIONS ═══ */
+section{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:108px 22px 65px;}
+.wrap{max-width:1060px;width:100%;}
+
+/* ═══ HERO ═══ */
+.hero-chip{
+  font-family:var(--mono);font-size:.68rem;letter-spacing:.28em;
+  color:var(--a1);text-transform:uppercase;margin-bottom:28px;
+  display:flex;align-items:center;gap:10px;
+}
+.hero-chip::before{content:'';width:34px;height:1px;background:var(--a1);}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--a3);
+  animation:ldot 1.6s infinite;}
+@keyframes ldot{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.35;transform:scale(.65);}}
+
+h1.hname{
+  font-family:var(--dis);
+  font-size:clamp(3.4rem,9vw,8rem);
+  font-weight:800;line-height:.9;letter-spacing:-.025em;margin-bottom:24px;
+}
+.np{display:block;color:var(--text);}
+.ng{
+  display:block;
+  background:linear-gradient(110deg,#38bdf8 0%,#818cf8 36%,#f472b6 62%,#34d399 88%);
+  background-size:260%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  animation:gs 5s ease infinite;
+}
+@keyframes gs{0%{background-position:0%;}50%{background-position:100%;}100%{background-position:0%;}}
+.cblink{display:inline-block;width:5px;height:.82em;background:var(--a1);
+  margin-left:4px;vertical-align:middle;animation:blink 1.1s step-end infinite;}
+@keyframes blink{50%{opacity:0;}}
+
+.role-wrap{
+  font-family:var(--mono);font-size:1rem;
+  color:var(--a2);letter-spacing:.04em;margin-bottom:10px;
+  min-height:1.5em;
+}
+#role-text{border-right:2px solid var(--a2);padding-right:3px;
+  animation:caretBlink 1s step-end infinite;}
+@keyframes caretBlink{50%{border-color:transparent;}}
+
+.hero-sub{font-family:var(--mono);font-size:.84rem;color:var(--muted);
+  letter-spacing:.06em;margin-bottom:14px;}
+.hero-tag{font-size:1.12rem;color:var(--text2);margin-bottom:40px;
+  max-width:500px;line-height:1.66;}
+.hbtns{display:flex;gap:13px;flex-wrap:wrap;}
+.btn1{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:var(--mono);font-size:.74rem;letter-spacing:.13em;text-transform:uppercase;
+  color:#03050f;background:var(--a1);
+  padding:13px 30px;border-radius:50px;text-decoration:none;font-weight:700;
+  box-shadow:0 0 30px rgba(56,189,248,.48);
+  transition:transform .24s,box-shadow .24s;
+}
+.btn1:hover{transform:translateY(-3px);box-shadow:0 0 50px rgba(56,189,248,.72);}
+.btn2{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:var(--mono);font-size:.74rem;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--a1);padding:13px 30px;border-radius:50px;text-decoration:none;
+  border:1px solid var(--bh);
+  transition:transform .24s,background .24s,box-shadow .24s;
+}
+.btn2:hover{transform:translateY(-3px);background:rgba(56,189,248,.08);box-shadow:var(--glow1);}
+
+.stats{display:flex;gap:42px;margin-top:50px;
+  border-top:1px solid var(--border);padding-top:32px;flex-wrap:wrap;}
+.sn{font-family:var(--dis);font-size:2.4rem;font-weight:800;color:var(--a1);}
+.sl{font-family:var(--mono);font-size:.65rem;color:var(--muted);
+  letter-spacing:.1em;text-transform:uppercase;margin-top:2px;}
+
+/* ═══ SEC HEAD ═══ */
+.slabel{font-family:var(--mono);font-size:.66rem;letter-spacing:.28em;
+  color:var(--a1);text-transform:uppercase;margin-bottom:11px;
+  display:flex;align-items:center;gap:9px;}
+.slabel::before{content:'';width:20px;height:1px;background:var(--a1);}
+h2.stitle{font-family:var(--dis);font-size:clamp(1.9rem,5vw,3.1rem);
+  font-weight:800;letter-spacing:-.022em;margin-bottom:46px;line-height:1.08;}
+
+/* ═══ SKILLS ═══ */
+.sgrid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:16px;
+}
+.sc{
+  background:linear-gradient(145deg,var(--surface),rgba(14,22,58,.58));
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:22px 20px 19px;
+  transition:transform .28s,border-color .28s,box-shadow .28s;
+  position:relative;overflow:hidden;transform-style:preserve-3d;
+}
+.sc::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at 90% 0%,rgba(56,189,248,.14),transparent 52%);
+  opacity:0;transition:opacity .28s;pointer-events:none;
+}
+.sc::after{
+  content:'';position:absolute;left:0;right:0;top:0;height:2px;
+  background:linear-gradient(90deg,var(--a1),var(--a2),var(--a4));
+  transform:scaleX(.35);transform-origin:left;
+  transition:transform .3s;
+}
+.sc:hover{
+  transform:translateY(-7px);
+  border-color:var(--bh);
+  box-shadow:var(--glow1),0 16px 40px rgba(0,0,0,.32);
+}
+.sc:hover::before{opacity:1;}
+.sc:hover::after{transform:scaleX(1);}
+.skill-top{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:12px;margin-bottom:18px;
+}
+.si{
+  width:42px;height:42px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.3rem;
+  background:rgba(56,189,248,.08);
+  border:1px solid rgba(56,189,248,.12);
+}
+.sp{
+  font-family:var(--mono);font-size:.68rem;font-weight:700;
+  color:var(--a1);padding:5px 8px;border-radius:7px;
+  background:rgba(56,189,248,.08);
+  border:1px solid rgba(56,189,248,.14);
+}
+.sn2{
+  font-family:var(--dis);font-size:.92rem;font-weight:700;
+  margin-bottom:13px;color:var(--text);
+}
+.sb-row{display:flex;align-items:center;gap:9px;}
+.sbw{
+  flex:1;height:6px;background:rgba(255,255,255,.07);
+  border-radius:10px;overflow:hidden;
+}
+.sb{
+  height:100%;border-radius:10px;width:0;
+  background:linear-gradient(90deg,var(--a1),var(--a2));
+  box-shadow:0 0 12px rgba(56,189,248,.3);
+  transition:width 1.5s cubic-bezier(.4,0,.2,1);
+}
+.skill-level{
+  font-family:var(--mono);font-size:.55rem;color:var(--muted);
+  letter-spacing:.06em;text-transform:uppercase;
+}
+@media(max-width:760px){
+  .sgrid{grid-template-columns:repeat(2,1fr);}
+}
+@media(max-width:500px){
+  .sgrid{grid-template-columns:1fr;}
+}
+
+/* ═══ PROJECTS ═══ */
+.pgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(285px,1fr));gap:17px;}
+.pc{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
+  padding:26px 24px;
+  transition:transform .33s cubic-bezier(.2,.9,.3,1),border-color .28s,box-shadow .28s;
+  position:relative;overflow:hidden;transform-style:preserve-3d;
+}
+.pc:hover{transform:translateY(-10px) rotateX(2deg) rotateY(-1.5deg);
+  border-color:var(--bh);box-shadow:0 18px 55px rgba(56,189,248,.16);}
+.pbadge{display:inline-block;font-family:var(--mono);font-size:.6rem;
+  letter-spacing:.12em;text-transform:uppercase;padding:3px 11px;
+  border-radius:50px;margin-bottom:15px;}
+.bai{background:rgba(56,189,248,.13);color:var(--a1);}
+.bhk{background:rgba(129,140,248,.13);color:var(--a2);}
+.brk{background:rgba(52,211,153,.13);color:var(--a3);}
+.bqz{background:rgba(244,114,182,.13);color:var(--a4);}
+.bpt{background:rgba(251,191,36,.13);color:var(--a5);}
+.pc h3{font-family:var(--dis);font-size:1.14rem;font-weight:700;margin-bottom:9px;color:var(--text);}
+.pc p{color:var(--text2);font-size:.85rem;line-height:1.65;margin-bottom:18px;}
+.plink{font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--a1);text-decoration:none;display:inline-flex;align-items:center;gap:6px;
+  transition:gap .22s;}
+.plink:hover{gap:12px;}
+.pglow{position:absolute;top:-50px;right:-50px;width:140px;height:140px;border-radius:50%;
+  background:radial-gradient(circle,rgba(56,189,248,.1),transparent 70%);pointer-events:none;}
+.pc.feat{grid-column:1/-1;display:grid;grid-template-columns:3fr 2fr;
+  gap:26px;align-items:center;
+  background:linear-gradient(135deg,rgba(8,14,40,.88),rgba(14,22,58,.92));
+  border-color:rgba(56,189,248,.26);}
+@media(max-width:600px){.pc.feat{grid-template-columns:1fr;}}
+.tpanel{background:rgba(56,189,248,.05);border:1px solid rgba(56,189,248,.13);
+  border-radius:13px;padding:18px;font-family:var(--mono);font-size:.74rem;
+  color:var(--muted);line-height:2.1;}
+.tpanel .tc{color:var(--a3);margin-bottom:7px;font-size:.68rem;}
+
+/* ═══ CERTIFICATES ═══ */
+.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;}
+.cc{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
+  text-decoration:none;color:var(--text);display:block;overflow:hidden;
+  transition:transform .28s,border-color .28s,box-shadow .28s;
+  position:relative;
+}
+.cc:hover{transform:translateY(-6px) scale(1.02);
+  border-color:rgba(52,211,153,.45);
+  box-shadow:0 0 30px rgba(52,211,153,.17);}
+
+/* Certificate image area */
+.cimg-wrap{
+  width:100%;height:130px;overflow:hidden;
+  background:rgba(56,189,248,.06);
+  display:flex;align-items:center;justify-content:center;
+  position:relative;
+}
+.cimg-wrap img{
+  width:100%;height:100%;object-fit:cover;
+  transition:transform .4s;
+  display:block;
+}
+.cc:hover .cimg-wrap img{transform:scale(1.08);}
+/* fallback emoji shown when image missing */
+.cimg-wrap .fallback{
+  font-size:2.4rem;position:absolute;
+  opacity:1;transition:opacity .3s;
+}
+.cimg-wrap img.loaded ~ .fallback{opacity:0;}
+.cimg-wrap img.error{display:none;}
+
+.cinfo{padding:14px 16px;}
+.cname{font-family:var(--dis);font-size:.88rem;font-weight:700;margin-bottom:4px;color:var(--text);}
+.cdesc{color:var(--muted);font-size:.75rem;line-height:1.5;}
+.cbadge{display:inline-block;margin-top:8px;font-family:var(--mono);font-size:.58rem;
+  letter-spacing:.08em;padding:2px 9px;border-radius:50px;
+  background:rgba(52,211,153,.12);color:var(--a3);}
+
+/* open overlay on click */
+.overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.88);
+  z-index:2000;display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .3s;
+}
+.overlay.open{opacity:1;pointer-events:all;}
+.overlay img{max-width:90vw;max-height:88vh;border-radius:12px;
+  box-shadow:0 0 60px rgba(56,189,248,.3);}
+.overlay-close{
+  position:absolute;top:22px;right:28px;font-size:2rem;
+  color:#fff;cursor:pointer;background:none;border:none;opacity:.7;
+  transition:opacity .2s;
+}
+.overlay-close:hover{opacity:1;}
+
+/* ═══ TIMELINE ═══ */
+.tl{position:relative;padding-left:28px;}
+.tl::before{content:'';position:absolute;left:5px;top:8px;bottom:8px;width:1px;
+  background:linear-gradient(to bottom,var(--a1),var(--a2),var(--a4),transparent);}
+.tli{position:relative;margin-bottom:38px;
+  opacity:0;transform:translateX(-16px);transition:opacity .6s,transform .6s;}
+.tli.show{opacity:1;transform:translateX(0);}
+.tld{position:absolute;left:-32px;top:4px;width:13px;height:13px;border-radius:50%;
+  border:2px solid var(--a1);background:var(--bg);
+  box-shadow:0 0 9px rgba(56,189,248,.5);}
+.tly{font-family:var(--mono);font-size:.66rem;color:var(--a1);letter-spacing:.12em;margin-bottom:4px;}
+.tlt{font-family:var(--dis);font-size:1.18rem;font-weight:700;margin-bottom:6px;color:var(--text);}
+.tldesc{color:var(--text2);font-size:.85rem;line-height:1.6;}
+
+/* ═══ RESUME ═══ */
+.rgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;margin-top:34px;}
+.rl{display:flex;align-items:center;gap:12px;
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
+  padding:19px 21px;text-decoration:none;color:var(--text);
+  transition:transform .26s,border-color .26s,box-shadow .26s;
+  font-family:var(--dis);font-weight:700;}
+.rl:hover{transform:translateY(-4px);border-color:var(--bh);box-shadow:var(--glow1);}
+.ri{width:38px;height:38px;border-radius:9px;display:flex;
+  align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;}
+.rir{background:rgba(248,113,113,.13);}
+.rib{background:rgba(56,189,248,.13);}
+.rip{background:rgba(129,140,248,.13);}
+.rig{background:rgba(52,211,153,.13);}
+.rsub{font-size:.7rem;color:var(--muted);font-family:var(--mono);margin-top:2px;}
+
+/* ═══ CHATBOT ═══ */
+.cfab{
+  position:fixed;bottom:24px;right:24px;
+  width:54px;height:54px;border-radius:50%;
+  background:linear-gradient(135deg,var(--a1),var(--a2));
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;cursor:none;border:none;outline:none;
+  z-index:500;transition:transform .22s;
+  animation:fabg 3s ease infinite;
+}
+@keyframes fabg{
+  0%,100%{box-shadow:0 0 22px rgba(56,189,248,.55),0 0 48px rgba(129,140,248,.28);}
+  50%{box-shadow:0 0 34px rgba(56,189,248,.82),0 0 68px rgba(129,140,248,.45);}
+}
+.cfab:hover{transform:scale(1.13) rotate(12deg);}
+.cbox{
+  position:fixed;bottom:92px;right:24px;width:316px;
+  border-radius:20px;flex-direction:column;overflow:hidden;
+  background:rgba(5,9,28,.93);backdrop-filter:blur(24px);
+  border:1px solid var(--border);
+  box-shadow:0 14px 55px rgba(0,0,0,.7),var(--glow1);
+  display:none;z-index:499;
+}
+[data-theme="light"] .cbox{background:rgba(238,245,255,.96);}
+.chdr{padding:12px 15px;border-bottom:1px solid var(--border);
+  font-family:var(--mono);font-size:.73rem;color:var(--a1);letter-spacing:.08em;
+  display:flex;align-items:center;gap:7px;}
+.cdot2{width:6px;height:6px;border-radius:50%;background:var(--a3);animation:ldot 1.5s infinite;}
+#cmsgs{height:195px;overflow-y:auto;padding:11px;font-size:.8rem;line-height:1.6;}
+#cmsgs::-webkit-scrollbar{width:3px;}
+#cmsgs::-webkit-scrollbar-thumb{background:var(--border);}
+.qbs{display:flex;flex-wrap:wrap;gap:5px;padding:7px 11px;}
+.qb{font-family:var(--mono);font-size:.62rem;letter-spacing:.05em;
+  background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.2);
+  color:var(--a1);padding:4px 10px;border-radius:50px;cursor:none;
+  transition:background .18s;}
+.qb:hover{background:rgba(56,189,248,.22);}
+.cinw{display:flex;border-top:1px solid var(--border);}
+#cinp{flex:1;padding:9px 12px;background:transparent;border:none;outline:none;
+  color:var(--text);font-family:var(--mono);font-size:.76rem;}
+.csend{padding:0 13px;background:transparent;border:none;color:var(--a1);cursor:none;font-size:.95rem;}
+.cm{margin-bottom:8px;}
+.cm .cl{font-family:var(--mono);font-size:.6rem;letter-spacing:.06em;margin-bottom:1px;}
+.cm.user .cl{color:var(--a2);}
+.cm.bot .cl{color:var(--a3);}
+
+/* ═══ REVEAL ═══ */
+.rv{opacity:0;transform:translateY(26px);
+  transition:opacity .72s cubic-bezier(.4,0,.2,1),transform .72s cubic-bezier(.4,0,.2,1);}
+.rv.show{opacity:1;transform:translateY(0);}
+.d1{transition-delay:.1s;}.d2{transition-delay:.2s;}
+.d3{transition-delay:.3s;}.d4{transition-delay:.4s;}
+
+/* ═══ FOOTER ═══ */
+footer{text-align:center;padding:34px 20px;
+  font-family:var(--mono);font-size:.68rem;
+  color:var(--muted);letter-spacing:.1em;
+  border-top:1px solid var(--border);}
+
+/* ═══ RESPONSIVE ═══ */
+@media(max-width:720px){
+  nav{padding:11px 16px;}
+  .nav-r{gap:12px;}
+  .nav-r a{font-size:.58rem;}
+  h1.hname{font-size:clamp(2.7rem,12vw,4.5rem);}
+  .stats{gap:22px;}
+  .sn{font-size:2rem;}
+}
+@media(max-width:440px){
+  .nav-r a:not(.tbtn){display:none;}
+  .hbtns{flex-direction:column;}
+}
+</style>
+</head>
+<body>
+
+<div id="cur"></div>
+<div id="cur-r"></div>
+<div class="grain"></div>
+<canvas id="bg"></canvas>
+
+<!-- image lightbox overlay -->
+<div class="overlay" id="overlay" onclick="closeOverlay()">
+  <button class="overlay-close" onclick="closeOverlay()">✕</button>
+  <img id="overlay-img" src="" alt="Certificate">
+</div>
+
+<!-- ═══ NAV ═══ -->
+<nav>
+  <div class="logo">HD_portfolio.v4</div>
+  <div class="nav-r">
+    <a href="#hero">Home</a>
+    <a href="#skills">Skills</a>
+    <a href="#projects">Projects</a>
+    <a href="#timeline">Journey</a>
+    <a href="#resume">Resume</a>
+    <a href="#certs">Certs</a>
+    <button class="tbtn" id="tbtn" onclick="toggleTheme()">☀ Light</button>
+  </div>
+</nav>
+
+<!-- ═══ HERO ═══ -->
+<section id="hero">
+<div class="wrap">
+  <div class="hero-chip rv"><span class="live-dot"></span>01 — Open to opportunities</div>
+  <h1 class="hname rv d1">
+    <span class="np">Honey</span>
+    <span class="ng">Darji<span class="cblink"></span></span>
+  </h1>
+  <div class="role-wrap rv d2"><span id="role-text"></span></div>
+  <p class="hero-sub rv d2">BCA Student @ CHARUSAT · AI Developer · Builder</p>
+  <p class="hero-tag rv d3">I build scalable, smart, and real-world solutions — at the intersection of design, AI, and technology.</p>
+  <div class="hbtns rv d3">
+    <a href="#projects" class="btn1">
+      View Projects
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+    </a>
+    <a href="#resume" class="btn2">Contact Me →</a>
+  </div>
+  <div class="stats rv d4">
+    <div><div class="sn">7+</div><div class="sl">Competitions</div></div>
+    <div><div class="sn">10+</div><div class="sl">Certificates</div></div>
+    <div><div class="sn">#224</div><div class="sl">HackTheRank</div></div>
+    <div><div class="sn">2nd</div><div class="sl">PU-CODE Rank</div></div>
+  </div>
+</div>
+</section>
+
+<!-- ═══ SKILLS ═══ -->
+<section id="skills">
+<div class="wrap">
+  <div class="slabel rv">02 — Proficiencies</div>
+  <h2 class="stitle rv">Skills &amp; Tools</h2>
+  <div class="sgrid">
+    <div class="sc rv">
+      <div class="skill-top"><div class="si">🌐</div><div class="sp">85%</div></div>
+      <div class="sn2">HTML / CSS / JS</div>
+      <div class="sb-row"><div class="sbw"><div class="sb" data-w="85"></div></div><span class="skill-level">Advanced</span></div>
+    </div>
+    <div class="sc rv d1">
+      <div class="skill-top"><div class="si">🐍</div><div class="sp">20%</div></div>
+      <div class="sn2">Python</div>
+      <div class="sb-row"><div class="sbw"><div class="sb" data-w="20"></div></div><span class="skill-level">Learning</span></div>
+    </div>
+    <div class="sc rv d2">
+      <div class="skill-top"><div class="si">🎨</div><div class="sp">80%</div></div>
+      <div class="sn2">UI/UX &amp; Figma</div>
+      <div class="sb-row"><div class="sbw"><div class="sb" data-w="80"></div></div><span class="skill-level">Strong</span></div>
+    </div>
+    <div class="sc rv d3">
+      <div class="skill-top"><div class="si">🐙</div><div class="sp">80%</div></div>
+      <div class="sn2">Git &amp; GitHub</div>
+      <div class="sb-row"><div class="sbw"><div class="sb" data-w="80"></div></div><span class="skill-level">Strong</span></div>
+    </div>
+    <div class="sc rv">
+      <div class="skill-top"><div class="si">🤖</div><div class="sp">70%</div></div>
+      <div class="sn2">AI Literacy</div>
+      <div class="sb-row"><div class="sbw"><div class="sb" data-w="70"></div></div><span class="skill-level">Strong</span></div>
+    </div>
+    <div class="sc rv d1">
+      <div class="skill-top"><div class="si">📊</div><div class="sp">70%</div></div>
+      <div class="sn2">Data Analysis</div>
+      <div class="sb-row"><div class="sbw"><div class="sb" data-w="70"></div></div><span class="skill-level">Strong</span></div>
+    </div>
+    <div class="sc rv d2">
+      <div class="skill-top"><div class="si">📈</div><div class="sp">50%</div></div>
+      <div class="sn2">SEO &amp; Digital Marketing</div>
+      <div class="sb-row"><div class="sbw"><div class="sb" data-w="50"></div></div><span class="skill-level">Growing</span></div>
+    </div>
+    <div class="sc rv d3">
+      <div class="skill-top"><div class="si">🏆</div><div class="sp">40%</div></div>
+      <div class="sn2">Hackathon Experience</div>
+      <div class="sb-row"><div class="sbw"><div class="sb" data-w="40"></div></div><span class="skill-level">Growing</span></div>
+    </div>
+    <div class="sc rv d1">
+      <div class="skill-top"><div class="si">🤝</div><div class="sp">50%</div></div>
+      <div class="sn2">Teamwork &amp; Leadership</div>
+      <div class="sb-row"><div class="sbw"><div class="sb" data-w="50"></div></div><span class="skill-level">Growing</span></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ═══ PROJECTS ═══ -->
+<section id="projects">
+<div class="wrap">
+  <div class="slabel rv">03 — Work</div>
+  <h2 class="stitle rv">Projects &amp; Hackathons</h2>
+  <div class="pgrid">
+
+    <div class="pc feat rv">
+      <div>
+        <div class="pbadge bai">⭐ Featured Project</div>
+        <h3>VendorGo — AI Platform</h3>
+        <p>Production-ready AI-powered digital presence platform for India's 50M+ street vendors. WhatsApp automation, AI catalogue generation, zero-tech-barrier onboarding — go digital in under 5 minutes.</p>
+        <a href="vendorGo-about.html" target="_blank" class="plink">Explore VendorGo →</a>
+      </div>
+      <div class="tpanel">
+        <div class="tc">// tech stack</div>
+        <div>→ WhatsApp Business API</div>
+        <div>→ AI / LLM Integration</div>
+        <div>→ HTML / CSS / JS Frontend</div>
+        <div>→ No-Code Vendor Dashboard</div>
+        <div>→ SEO &amp; Digital Presence</div>
+        <div style="margin-top:11px;color:var(--a1);">50M+ target users</div>
+      </div>
+      <div class="pglow"></div>
+    </div>
+
+    <div class="pc rv">
+      <div class="pbadge brk">🥈 2nd Rank</div>
+      <h3>PU-CODE Hackathon 3.0</h3>
+      <p>Secured 2nd Rank at Parul University competitive coding hackathon. Logic-driven problem solving under intense time pressure.</p>
+      <a href="pucodecertificate.jpeg" target="_blank" class="plink">View Certificate →</a>
+      <div class="pglow" style="background:radial-gradient(circle,rgba(52,211,153,.1),transparent 70%);"></div>
+    </div>
+
+    <div class="pc rv d1">
+      <div class="pbadge bhk">⚡ Hackathon</div>
+      <h3>Tech-Tonic Hackathon</h3>
+      <p>High-pressure team hackathon focused on rapid prototyping, collaborative engineering, and logic-driven product delivery.</p>
+      <a href="techtoniccertifiacte.jpeg" target="_blank" class="plink">View Certificate →</a>
+      <div class="pglow" style="background:radial-gradient(circle,rgba(129,140,248,.1),transparent 70%);"></div>
+    </div>
+
+    <div class="pc rv d2">
+      <div class="pbadge bhk">🌐 GDG</div>
+      <h3>GDG Hackathon</h3>
+      <p>Google Developer Group hackathon — project showcase and collaborative development gaining exposure to the Google tech ecosystem.</p>
+      <div class="pglow" style="background:radial-gradient(circle,rgba(56,189,248,.1),transparent 70%);"></div>
+    </div>
+
+    <div class="pc rv">
+      <div class="pbadge bqz">🧠 AI Quiz</div>
+      <h3>Techedge: Future Clash AI Quiz</h3>
+      <p>AI-focused quiz at Techedge showcasing AI Literacy, knowledge of emerging models, and real-world AI application understanding.</p>
+      <div class="pglow" style="background:radial-gradient(circle,rgba(244,114,182,.1),transparent 70%);"></div>
+    </div>
+
+    <div class="pc rv d1">
+      <div class="pbadge brk">🏅 Rank #224</div>
+      <h3>HackTheRank Competition</h3>
+      <p>Secured Rank #224 in the HackTheRank competitive programming challenge on a national platform — strong algorithmic thinking.</p>
+      <div class="pglow" style="background:radial-gradient(circle,rgba(52,211,153,.1),transparent 70%);"></div>
+    </div>
+
+    <div class="pc rv d2">
+      <div class="pbadge bpt">🎤 Pitching</div>
+      <h3>Charusat National Youth Day Pitching</h3>
+      <p>Presented real-world tech solutions at CHARUSAT's National Youth Day event — entrepreneurial communication and product ideation.</p>
+      <div class="pglow" style="background:radial-gradient(circle,rgba(251,191,36,.1),transparent 70%);"></div>
+    </div>
+
+  </div>
+</div>
+</section>
+
+<!-- ═══ TIMELINE ═══ -->
+<section id="timeline">
+<div class="wrap">
+  <div class="slabel rv">04 — Journey</div>
+  <h2 class="stitle rv">My Path So Far</h2>
+  <div class="tl">
+    <div class="tli"><div class="tld"></div>
+      <div class="tly">2024 — Present</div>
+      <div class="tlt">BCA @ CHARUSAT University</div>
+      <div class="tldesc">Pursuing BCA with strong foundations in CS, programming logic, data analysis, and software engineering principles.</div>
+    </div>
+    <div class="tli"><div class="tld" style="border-color:var(--a2);box-shadow:0 0 9px rgba(129,140,248,.5);"></div>
+      <div class="tly">2024</div>
+      <div class="tlt">Hackathons &amp; AI Competitions</div>
+      <div class="tldesc">Competed in Tech-Tonic, PU-CODE (🥈 2nd Rank), GDG Hackathon, HackTheRank (#224), Techedge AI Quiz, and National Youth Day Pitching.</div>
+    </div>
+    <div class="tli"><div class="tld" style="border-color:var(--a4);box-shadow:0 0 9px rgba(244,114,182,.5);"></div>
+      <div class="tly">2024</div>
+      <div class="tlt">VendorGo — AI-Powered Platform</div>
+      <div class="tldesc">Conceived and built VendorGo — production-grade AI platform for India's 50M+ street vendors with WhatsApp automation.</div>
+    </div>
+    <div class="tli"><div class="tld" style="border-color:var(--a3);box-shadow:0 0 9px rgba(52,211,153,.5);"></div>
+      <div class="tly">2024</div>
+      <div class="tlt">Certifications &amp; Volunteering</div>
+      <div class="tldesc">Earned AI Literacy, Tally Prime, Microsoft Office 365, Ignite, and NSS volunteering certificates. Cross-domain competence built.</div>
+    </div>
+    <div class="tli"><div class="tld" style="border-color:var(--a1);background:rgba(56,189,248,.18);box-shadow:0 0 11px rgba(56,189,248,.6);"></div>
+      <div class="tly">2025 → Future</div>
+      <div class="tlt">   
+</div>
+      <div class="tldesc">Advancing toward mastery in AI systems, scalable web development, and entrepreneurial product building.</div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ═══ RESUME ═══ -->
+<section id="resume">
+<div class="wrap">
+  <div class="slabel rv">05 — Connect</div>
+  <h2 class="stitle rv">Resume &amp; Links</h2>
+  <div class="rgrid rv">
+    <a href="HONEYDARJI_RESUME (2).pdf" download class="rl">
+      <div class="ri rir">📄</div>
+      <div><div>Download Resume</div><div class="rsub">PDF · Updated 2024</div></div>
+    </a>
+    <a href="HONEYDARJI_RESUME (2).pdf" target="_blank" class="rl">
+      <div class="ri rib">🔗</div>
+      <div><div>View Resume</div><div class="rsub">Opens in new tab</div></div>
+    </a>
+    <a href="https://github.com/darjihoney02-web" target="_blank" class="rl">
+      <div class="ri rib">🐙</div>
+      <div><div>GitHub</div><div class="rsub">darjihoney02-web</div></div>
+    </a>
+    <a href="https://www.linkedin.com/in/honey-darji-0202S78371" target="_blank" class="rl">
+      <div class="ri rip">💼</div>
+      <div><div>LinkedIn</div><div class="rsub">honey-darji</div></div>
+    </a>
+  </div>
+</div>
+</section>
+
+<!-- ═══ CERTIFICATES ═══ -->
+<section id="certs">
+<div class="wrap">
+  <div class="slabel rv">06 — Achievements</div>
+  <h2 class="stitle rv">Certificates &amp; Achievements</h2>
+  <div class="cgrid">
+
+    <div class="cc rv" onclick="openCert('tallycertificate.jpeg')">
+      <div class="cimg-wrap">
+        <span class="fallback">📒</span>
+        <img src="tallycertificate.jpeg" alt="Tally Certificate" loading="lazy" onload="this.classList.add('loaded')" onerror="this.classList.add('error')">
+      </div>
+      <div class="cinfo">
+        <div class="cname">Tally Prime</div>
+        <div class="cdesc">Accounting &amp; ERP fundamentals.</div>
+        <span class="cbadge">Certified</span>
+      </div>
+    </div>
+
+    <div class="cc rv d1" onclick="openCert('msofficecertificate.jpeg')">
+      <div class="cimg-wrap">
+        <span class="fallback">💼</span>
+        <img src="msofficecertificate.jpeg" alt="MS Office Certificate" loading="lazy" onload="this.classList.add('loaded')" onerror="this.classList.add('error')">
+      </div>
+      <div class="cinfo">
+        <div class="cname">Microsoft Office 365</div>
+        <div class="cdesc">Office &amp; productivity training.</div>
+        <span class="cbadge">Certified</span>
+      </div>
+    </div>
+
+    <div class="cc rv d2" onclick="openCert('pucodecertificate.jpeg')">
+      <div class="cimg-wrap">
+        <span class="fallback">🥈</span>
+        <img src="pucodecertificate.jpeg" alt="PU Code Certificate" loading="lazy" onload="this.classList.add('loaded')" onerror="this.classList.add('error')">
+      </div>
+      <div class="cinfo">
+        <div class="cname">PU-CODE 3.0</div>
+        <div class="cdesc">2nd Rank at Parul University hackathon.</div>
+        <span class="cbadge" style="background:rgba(251,191,36,.14);color:var(--a5);">2nd Rank</span>
+      </div>
+    </div>
+
+    <div class="cc rv d3" onclick="openCert('techtoniccertifiacte.jpeg')">
+      <div class="cimg-wrap">
+        <span class="fallback">⚡</span>
+        <img src="techtoniccertifiacte.jpeg" alt="Tech-Tonic Certificate" loading="lazy" onload="this.classList.add('loaded')" onerror="this.classList.add('error')">
+      </div>
+      <div class="cinfo">
+        <div class="cname">Tech-Tonic Hackathon</div>
+        <div class="cdesc">Hackathon participation &amp; completion.</div>
+        <span class="cbadge">Participated</span>
+      </div>
+    </div>
+
+    <div class="cc rv" onclick="openCert('nsscertificate.jpeg')">
+      <div class="cimg-wrap">
+        <span class="fallback">🤝</span>
+        <img src="nsscertificate.jpeg" alt="NSS Certificate" loading="lazy" onload="this.classList.add('loaded')" onerror="this.classList.add('error')">
+      </div>
+      <div class="cinfo">
+        <div class="cname">CMPICA NSS Patriotica</div>
+        <div class="cdesc">Student volunteer service.</div>
+        <span class="cbadge">Volunteer</span>
+      </div>
+    </div>
+
+    <div class="cc rv d1" onclick="openCert('ignitecertificate.jpeg')">
+      <div class="cimg-wrap">
+        <span class="fallback">🔥</span>
+        <img src="ignitecertificate.jpeg" alt="Ignite Certificate" loading="lazy" onload="this.classList.add('loaded')" onerror="this.classList.add('error')">
+      </div>
+      <div class="cinfo">
+        <div class="cname">Ignite Certificate</div>
+        <div class="cdesc">Student volunteer activity.</div>
+        <span class="cbadge">Volunteer</span>
+      </div>
+    </div>
+
+    <div class="cc rv d2" onclick="openCert('ailiteracycertificate.jpeg')">
+      <div class="cimg-wrap">
+        <span class="fallback">🤖</span>
+        <img src="ailiteracycertificate.jpeg" alt="AI Literacy Certificate" loading="lazy" onload="this.classList.add('loaded')" onerror="this.classList.add('error')">
+      </div>
+      <div class="cinfo">
+        <div class="cname">AI Literacy</div>
+        <div class="cdesc">Foundational AI knowledge &amp; tools.</div>
+        <span class="cbadge">Certified</span>
+      </div>
+    </div>
+
+    <div class="cc rv d3" onclick="openCert('hacktherankcertificate.jpeg')">
+      <div class="cimg-wrap">
+        <span class="fallback">🏅</span>
+        <img src="hacktherankcertificate.jpeg" alt="HackTheRank Certificate" loading="lazy" onload="this.classList.add('loaded')" onerror="this.classList.add('error')">
+      </div>
+      <div class="cinfo">
+        <div class="cname">HackTheRank</div>
+        <div class="cdesc">National competitive programming.</div>
+        <span class="cbadge" style="background:rgba(129,140,248,.14);color:var(--a2);">Rank #224</span>
+      </div>
+    </div>
+
+    <div class="cc rv" onclick="openCert('gdgcertificate.jpeg')">
+      <div class="cimg-wrap">
+        <span class="fallback">🌐</span>
+        <img src="gdgcertificate.jpeg" alt="GDG Certificate" loading="lazy" onload="this.classList.add('loaded')" onerror="this.classList.add('error')">
+      </div>
+      <div class="cinfo">
+        <div class="cname">GDG Hackathon</div>
+        <div class="cdesc">Google Developer Group event.</div>
+        <span class="cbadge">Participated</span>
+      </div>
+    </div>
+
+    <div class="cc rv d1" onclick="openCert('techedgecertificate.jpeg')">
+      <div class="cimg-wrap">
+        <span class="fallback">🧠</span>
+        <img src="techedgecertificate.jpeg" alt="Techedge Certificate" loading="lazy" onload="this.classList.add('loaded')" onerror="this.classList.add('error')">
+      </div>
+      <div class="cinfo">
+        <div class="cname">Future Clash AI Quiz</div>
+        <div class="cdesc">Techedge AI competition.</div>
+        <span class="cbadge">Participated</span>
+      </div>
+    </div>
+
+  </div>
+  <p style="font-family:var(--mono);font-size:.68rem;color:var(--muted);margin-top:18px;opacity:.7;">
+    💡 Click any certificate card to view full image. If an image isn't uploaded yet, the emoji placeholder shows.
+  </p>
+</div>
+</section>
+
+<footer>
+  <div style="margin-bottom:5px;">✦ Honey Darji — BCA Developer &amp; AI Enthusiast ✦</div>
+  <div style="opacity:.4;">CHARUSAT University · Anand, Gujarat · India</div>
+</footer>
+
+<!-- ═══ CHATBOT ═══ -->
+<button class="cfab" onclick="toggleChat()">🤖</button>
+<div class="cbox" id="cbox">
+  <div class="chdr"><div class="cdot2"></div>Portfolio AI — Ask me anything</div>
+  <div class="qbs">
+    <button class="qb" onclick="qk('projects')">🚀 Projects</button>
+    <button class="qb" onclick="qk('skills')">💡 Skills</button>
+    <button class="qb" onclick="qk('certificates')">🏆 Certs</button>
+    <button class="qb" onclick="qk('contact')">📩 Contact</button>
+    <button class="qb" onclick="qk('about')">👤 About</button>
+  </div>
+  <div id="cmsgs"></div>
+  <div class="cinw">
+    <input id="cinp" type="text" placeholder="Ask about Honey..." onkeydown="if(event.key==='Enter')sendC()">
+    <button class="csend" onclick="sendC()">↑</button>
+  </div>
+</div>
+
+<script>
+/* ── CURSOR ── */
+const cur=document.getElementById("cur"),ring=document.getElementById("cur-r");
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener("mousemove",e=>{mx=e.clientX;my=e.clientY;
+  cur.style.left=mx+"px";cur.style.top=my+"px";});
+(function ar(){rx+=(mx-rx)*.1;ry+=(my-ry)*.1;
+  ring.style.left=rx+"px";ring.style.top=ry+"px";requestAnimationFrame(ar);})();
+document.querySelectorAll("a,button,.sc,.pc,.cc,.qb,.rl").forEach(el=>{
+  el.addEventListener("mouseenter",()=>document.body.classList.add("ch"));
+  el.addEventListener("mouseleave",()=>document.body.classList.remove("ch"));
+});
+
+/* ── CANVAS ── */
+const cv=document.getElementById("bg"),cx=cv.getContext("2d");
+let W,H,pts=[];
+function rsz(){W=cv.width=innerWidth;H=cv.height=innerHeight;}
+window.addEventListener("resize",rsz);rsz();
+for(let i=0;i<95;i++) pts.push({x:Math.random()*W,y:Math.random()*H,
+  vx:(Math.random()-.5)*.38,vy:(Math.random()-.5)*.38,r:Math.random()*1.4+.4});
+function draw(){
+  cx.clearRect(0,0,W,H);
+  const lt=document.documentElement.getAttribute("data-theme")==="light";
+  pts.forEach((p,i)=>{
+    p.x+=p.vx;p.y+=p.vy;
+    if(p.x<0||p.x>W)p.vx*=-1;if(p.y<0||p.y>H)p.vy*=-1;
+    pts.slice(i+1).forEach(q=>{
+      const d=Math.hypot(p.x-q.x,p.y-q.y);
+      if(d<150){const a=(1-d/150)*.32;
+        cx.strokeStyle=lt?`rgba(14,100,175,${a})`:`rgba(56,189,248,${a})`;
+        cx.lineWidth=.5;cx.beginPath();cx.moveTo(p.x,p.y);cx.lineTo(q.x,q.y);cx.stroke();}
+    });
+    cx.fillStyle=lt?"rgba(14,100,175,.5)":"rgba(56,189,248,.55)";
+    cx.beginPath();cx.arc(p.x,p.y,p.r,0,Math.PI*2);cx.fill();
+  });
+  requestAnimationFrame(draw);
+}
+draw();
+
+/* ── TYPING ROLE EFFECT ── */
+const roles=["AI Developer 🤖","Hackathon Enthusiast 🚀","Future Software Engineer 💻","VendorGo Founder ⭐"];
+let ri=0,ci=0,del=false;
+const rt=document.getElementById("role-text");
+function typeRole(){
+  const word=roles[ri];
+  if(!del&&ci<=word.length){rt.textContent=word.slice(0,ci++);setTimeout(typeRole,ci>word.length?1400:90);}
+  else if(!del){del=true;setTimeout(typeRole,200);}
+  else if(ci>0){rt.textContent=word.slice(0,--ci);setTimeout(typeRole,45);}
+  else{del=false;ri=(ri+1)%roles.length;setTimeout(typeRole,300);}
+}
+typeRole();
+
+/* ── THEME ── */
+function toggleTheme(){
+  const h=document.documentElement,lt=h.getAttribute("data-theme")==="light";
+  h.setAttribute("data-theme",lt?"dark":"light");
+  document.getElementById("tbtn").textContent=lt?"☀ Light":"🌙 Dark";
+}
+
+/* ── SCROLL REVEAL ── */
+const obs=new IntersectionObserver(en=>{
+  en.forEach(e=>{
+    if(e.isIntersecting){
+      e.target.classList.add("show");
+      e.target.querySelectorAll(".sb").forEach(b=>b.style.width=b.dataset.w+"%");
+    }
+  });
+},{threshold:.09});
+document.querySelectorAll(".rv,.tli").forEach(el=>obs.observe(el));
+document.querySelectorAll(".sb").forEach(b=>{
+  new IntersectionObserver(en=>{if(en[0].isIntersecting)b.style.width=b.dataset.w+"%";},{threshold:.1})
+    .observe(b.closest(".sc"));
+});
+
+/* ── CERTIFICATE LIGHTBOX ── */
+function openCert(src){
+  const ov=document.getElementById("overlay");
+  const img=document.getElementById("overlay-img");
+  img.src=src;
+  ov.classList.add("open");
+}
+function closeOverlay(){document.getElementById("overlay").classList.remove("open");}
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeOverlay();});
+
+/* ── CHATBOT ── */
+function toggleChat(){
+  const b=document.getElementById("cbox");
+  b.style.display=b.style.display==="flex"?"none":"flex";
+}
+function qk(t){document.getElementById("cinp").value=t;sendC();}
+function sendC(){
+  const inp=document.getElementById("cinp");
+  const msg=inp.value.trim().toLowerCase();if(!msg)return;
+  addM("You",msg,"user");inp.value="";
+  setTimeout(()=>botR(msg),340);
+}
+function addM(sender,text,cls){
+  const box=document.getElementById("cmsgs");
+  const d=document.createElement("div");
+  d.className="cm "+cls;
+  d.innerHTML=`<div class="cl">${sender}</div><div>${text}</div>`;
+  box.appendChild(d);box.scrollTop=box.scrollHeight;return d;
+}
+const R={
+  project:["🚀 7 projects/competitions! Flagship: VendorGo (AI for 50M+ vendors). Also PU-CODE 🥈2nd Rank, Tech-Tonic, GDG, HackTheRank #224, Techedge AI Quiz & Youth Day Pitching!","projects"],
+  vendorgo:["⭐ VendorGo — AI-powered digital platform for India's 50M+ street vendors. WhatsApp automation, AI catalogue generation, zero-barrier onboarding!","projects"],
+  skill:["💡 11 skills: HTML/CSS/JS, Python, UI/UX, Git, AI Literacy (90%), Data Analysis, Tally, MS Office 365, SEO & Marketing, Hackathon Experience, Leadership!","skills"],
+  cert:["🏆 10 certificates: AI Literacy, Tally, MS Office, PU-CODE (2nd!), Tech-Tonic, NSS, Ignite, HackTheRank #224, GDG, Techedge AI Quiz!","certs"],
+  contact:["📩 Connect on LinkedIn, GitHub, or grab the PDF resume. Scrolling to links!","resume"],
+  about:["👋 Honey Darji — 1st year BCA at CHARUSAT, Anand, Gujarat. AI developer, hackathon competitor (7+ events), VendorGo founder, aspiring Full-Stack AI Developer!",null],
+  hackathon:["⚡ 7 competitions: PU-CODE (🥈 2nd), Tech-Tonic, GDG, HackTheRank (#224), Techedge AI Quiz, Youth Day Pitching!","projects"],
+  rank:["🏅 2nd Rank at PU-CODE Hackathon 3.0 and Rank #224 at HackTheRank competition!","projects"],
+  ai:["🤖 AI Literacy = top skill at 90%! Built VendorGo with LLM integration, participated in Techedge Future Clash AI Quiz, holds AI Literacy Certificate!","skills"],
+  python:["🐍 Python is one of Honey's growing skills at 65% — used for data analysis and AI-related projects!","skills"],
+};
+function botR(msg){
+  let rep="🤖 Try: projects / vendorgo / skills / certificates / contact / about / hackathon / rank / ai / python";
+  let sec=null;
+  for(const[k,v] of Object.entries(R)){
+    if(msg.includes(k)){rep=v[0];sec=v[1];break;}
+  }
+  if(sec) document.getElementById(sec).scrollIntoView({behavior:"smooth"});
+  const el=addM("AI","","bot");
+  let i=0;
+  const iv=setInterval(()=>{
+    el.querySelector("div:last-child").textContent+=rep[i];
+    i++;if(i>=rep.length)clearInterval(iv);
+  },15);
+}
+</script>
+</body>
+</html>
